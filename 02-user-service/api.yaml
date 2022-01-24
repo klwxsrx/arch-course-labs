@@ -1,0 +1,110 @@
+openapi: 3.0.0
+info:
+  description: ''
+  version: '1.0.0'
+  title: User Service
+servers:
+  - description: Local Server
+    url: http://arch.homework/
+tags:
+  - name: user
+paths:
+  /user:
+    post:
+      tags:
+        - user
+      summary: Create User
+      operationId: createUser
+      responses:
+        200:
+          description: 'Success result'
+        409:
+          description: 'User already exists'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+  /user/{userID}:
+    parameters:
+      - name: userID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - user
+      summary: Get User
+      operationId: getUser
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: 'Success result'
+        404:
+          description: 'User not found'
+    put:
+      tags:
+        - user
+      summary: Update User
+      operationId: updateUser
+      responses:
+        200:
+          description: 'Success result'
+        404:
+          description: 'User not found'
+        409:
+          description: 'User with specified email already exists'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserData'
+    delete:
+      tags:
+        - user
+      summary: Delete User
+      operationId: deleteUser
+      responses:
+        200:
+          description: 'Success result'
+        404:
+          description: 'User not found'
+components:
+  schemas:
+    UserData:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - firstName
+        - lastName
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
