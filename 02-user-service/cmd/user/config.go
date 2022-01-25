@@ -7,7 +7,8 @@ import (
 
 type config struct {
 	DBName     string
-	DBAddress  string
+	DBHost     string
+	DBPort     string
 	DBUser     string
 	DBPassword string
 }
@@ -26,7 +27,8 @@ func parseEnvString(key string, err error) (string, error) {
 func parseConfig() (*config, error) {
 	var err error
 	dbName, err := parseEnvString("DATABASE_NAME", err)
-	dbAddress, err := parseEnvString("DATABASE_ADDRESS", err)
+	dbHost, err := parseEnvString("DATABASE_HOST", err)
+	dbPort, err := parseEnvString("DATABASE_PORT", err)
 	dbUser, err := parseEnvString("DATABASE_USER", err)
 	dbPassword, err := parseEnvString("DATABASE_PASSWORD", err)
 
@@ -36,7 +38,8 @@ func parseConfig() (*config, error) {
 
 	return &config{
 		dbName,
-		dbAddress,
+		dbHost,
+		dbPort,
 		dbUser,
 		dbPassword,
 	}, nil

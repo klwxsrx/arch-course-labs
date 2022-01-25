@@ -22,12 +22,13 @@ type Config struct {
 type Dsn struct {
 	User     string
 	Password string
-	Address  string
+	Host     string
+	Port     string
 	Database string
 }
 
 func (d Dsn) String() string {
-	return fmt.Sprintf("%s:%s@(%s)/%s", d.User, d.Password, d.Address, d.Database)
+	return fmt.Sprintf("%s:%s@(%s:%s)/%s", d.User, d.Password, d.Host, d.Port, d.Database)
 }
 
 type Connection interface {

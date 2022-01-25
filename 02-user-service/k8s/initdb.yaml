@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: userservice-initdb
+spec:
+  template:
+    metadata:
+      name: userservice-initdb
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: create-table
+          image: mysql:8.0
+          env:
+            - name: HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: userservice-config
+                  key: database-host
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: userservice-config
+                  key: database-port
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: userservice-db-access
+                  key: mysql-database
+            - name: USER
+              valueFrom:
+                secretKeyRef:
+                  name: userservice-db-access
+                  key: mysql-user
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: userservice-db-access
+                  key: mysql-password
+          command:
+            - sh
+            - '-c'
+            - |
+              mysql --host=$HOST --port=$PORT --user=$USER --password=$PASSWORD $DB_NAME <<EOF
+                CREATE TABLE user (
+                  id BINARY(16), 
+                  email VARCHAR(255),
+                  first_name VARCHAR(255),
+                  last_name VARCHAR(255),
+                  PRIMARY KEY (id),
+                  UNIQUE (email)
+                ) ENGINE = InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+              EOF

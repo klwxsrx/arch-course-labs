@@ -40,7 +40,8 @@ func getDatabaseClient(config *config, logger log.Logger) (commonMysql.Connectio
 	db, err := commonMysql.NewConnection(commonMysql.Config{DSN: commonMysql.Dsn{
 		User:     config.DBUser,
 		Password: config.DBPassword,
-		Address:  config.DBAddress,
+		Host:     config.DBHost,
+		Port:     config.DBPort,
 		Database: config.DBName,
 	}}, logger)
 	if err != nil {
