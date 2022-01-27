@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-service-config
+data:
+  mysql-host: {{ include "mysql.fullname" . }}
+  mysql-port: "{{ .Values.mysql.primary.service.port }}"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: user-service-db-access
+type: Opaque
+data:
+  mysql-database: {{ .Values.mysql.auth.database | b64enc | quote }}
+  mysql-user: {{ .Values.mysql.auth.username | b64enc | quote }}
+  mysql-password: {{ .Values.mysql.auth.password | b64enc | quote }}

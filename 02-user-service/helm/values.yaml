@@ -1,0 +1,30 @@
+replicaCount: 2
+
+image:
+  repository: klwxsrx/arch-course-labs-userservice
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: arch.homework
+      paths:
+        - path: /
+          pathType: Prefix
+
+mysql:
+  image:
+    repository: bitnami/mysql
+    tag: "8.0"
+  auth:
+    database: user
+    username: user
+    password: test1234
+  primary:
+    service:
+      port: 3306

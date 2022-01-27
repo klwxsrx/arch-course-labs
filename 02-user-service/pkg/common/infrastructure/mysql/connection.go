@@ -61,7 +61,7 @@ func (c *connection) openConnection() error {
 	}
 
 	c.db.SetMaxOpenConns(maxOpenConnections)
-	const connTimeout = 20
+	const connTimeout = 30 * time.Second
 
 	err = backoff.Retry(func() error {
 		return c.db.Ping()

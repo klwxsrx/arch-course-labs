@@ -1,0 +1,29 @@
+{{- if .Values.ingress.enabled }}
+{{- $serviceName :=include "user-service.fullname" . }}
+{{- $servicePort := .Values.service.port }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "user-service.fullname" . }}
+  {{- if .Values.ingress.annotations }}
+  annotations: {{ toYaml .Values.ingress.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  rules:
+    {{- if .Values.ingress.hosts }}
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ $servicePort }}
+          {{- end }}
+    {{- end }}
+    {{- end }}
+{{- end }}

@@ -1,45 +1,44 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: userservice
+  name: {{ include "user-service.fullname" . }}
+  labels: {{ include "user-service.labels" . | nindent 4 }}
 spec:
-  replicas: 3
+  replicas: {{ .Values.replicaCount }}
   selector:
-    matchLabels:
-      app: userservice
+    matchLabels: {{ include "user-service.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      labels:
-        app: userservice
+      labels: {{ include "user-service.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-        - name: userservice
-          image: klwxsrx/arch-course-labs-userservice
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}:{{ .Chart.AppVersion }}
           env:
             - name: DATABASE_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: userservice-config
-                  key: database-host
+                  name: user-service-config
+                  key: mysql-host
             - name: DATABASE_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: userservice-config
-                  key: database-port
+                  name: user-service-config
+                  key: mysql-port
             - name: DATABASE_NAME
               valueFrom:
                 secretKeyRef:
-                  name: userservice-db-access
+                  name: user-service-db-access
                   key: mysql-database
             - name: DATABASE_USER
               valueFrom:
                 secretKeyRef:
-                  name: userservice-db-access
+                  name: user-service-db-access
                   key: mysql-user
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: userservice-db-access
+                  name: user-service-db-access
                   key: mysql-password
           ports:
             - containerPort: 8080
