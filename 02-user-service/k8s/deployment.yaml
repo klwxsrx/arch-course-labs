@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userservice
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: userservice
+  template:
+    metadata:
+      labels:
+        app: userservice
+    spec:
+      containers:
+        - name: userservice
+          image: klwxsrx/arch-course-labs-userservice:1.0.0
+          env:
+            - name: DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: userservice-config
+                  key: mysql-host
+            - name: DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: userservice-config
+                  key: mysql-port
+            - name: DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: userservice-db-access
+                  key: mysql-database
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: userservice-db-access
+                  key: mysql-user
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: userservice-db-access
+                  key: mysql-password
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080

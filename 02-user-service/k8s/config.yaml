@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: userservice-config
+data:
+  mysql-host: userservice-db-mysql
+  mysql-port: "3306"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: userservice-db-access
+type: Opaque
+stringData:
+  mysql-database: user
+  mysql-user: user
+  mysql-password: test1234
