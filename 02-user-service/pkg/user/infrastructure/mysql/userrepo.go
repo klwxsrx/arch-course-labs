@@ -50,6 +50,9 @@ func (r *userRepo) Get(id uuid.UUID) (*app.User, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, app.ErrUserNotFound
 	}
+	if err != nil {
+		return nil, err
+	}
 	return &app.User{
 		ID:        dbUser.ID,
 		Email:     dbUser.Email,

@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/klwxsrx/arch-course-labs/user-service/pkg/common/app/log"
+	"github.com/klwxsrx/arch-course-labs/user-service/pkg/common/infrastructure/metrics"
 	"github.com/klwxsrx/arch-course-labs/user-service/pkg/common/infrastructure/transport"
 	"github.com/klwxsrx/arch-course-labs/user-service/pkg/user/app"
 	"io"
@@ -15,6 +16,11 @@ import (
 var (
 	errInvalidParameter = errors.New("invalid parameter")
 	errEmptyJSONBody    = errors.New("empty json body")
+)
+
+const (
+	metricsEndpoint = "/metrics"
+	healthEndpoint  = "/healthz"
 )
 
 type requestHandlerFunc func(request *http.Request, service app.UserService) (result interface{}, err error)
@@ -55,8 +61,8 @@ func getRoutes() []route {
 		{
 			"health",
 			http.MethodGet,
-			"/healthz",
-			livenessCheckHandler,
+			healthEndpoint,
+			healthCheckHandler,
 		},
 	}
 }
@@ -127,7 +133,7 @@ func deleteUserHandler(request *http.Request, service app.UserService) (result i
 	return nil, service.Delete(id)
 }
 
-func livenessCheckHandler(_ *http.Request, _ app.UserService) (result interface{}, err error) {
+func healthCheckHandler(_ *http.Request, _ app.UserService) (result interface{}, err error) {
 	return struct {
 		Status string `json:"status"`
 	}{"OK"}, nil
@@ -170,8 +176,15 @@ func getHandlerFunc(userService app.UserService, handler requestHandlerFunc, log
 	}
 }
 
-func NewHTTPHandler(userService app.UserService, logger log.Logger) http.Handler {
+func NewHTTPHandler(userService app.UserService, logger log.Logger) (http.Handler, error) {
+	metricsHandler, err := metrics.NewHTTPHandler()
+	if err != nil {
+		return nil, err
+	}
+
 	router := mux.NewRouter()
+	router.Methods(http.MethodGet).Path(metricsEndpoint).Handler(metricsHandler.MetricsHandler())
+
 	for _, route := range getRoutes() {
 		router.
 			Methods(route.Method).
@@ -179,6 +192,8 @@ func NewHTTPHandler(userService app.UserService, logger log.Logger) http.Handler
 			Name(route.Name).
 			HandlerFunc(getHandlerFunc(userService, route.Handler, logger))
 	}
-	router.Use(transport.GetLoggingMiddleware(logger))
-	return router
+
+	router.Use(metricsHandler.Middleware([]string{metricsEndpoint, healthEndpoint}))
+	router.Use(transport.NewLoggingMiddleware(logger))
+	return router, nil
 }

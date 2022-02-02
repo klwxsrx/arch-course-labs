@@ -29,7 +29,10 @@ func main() {
 
 	userService := app.NewUserService(mysql.NewUserRepository(client))
 
-	server := startServer(userService, logger)
+	server, err := startServer(userService, logger)
+	if err != nil {
+		logger.WithError(err).Fatal("failed to start server")
+	}
 	logger.Info("app is ready")
 
 	listenOSKillSignals()
@@ -55,17 +58,21 @@ func getDatabaseClient(config *config, logger log.Logger) (commonMysql.Connectio
 	return db, client, nil
 }
 
-func startServer(userService app.UserService, logger log.Logger) *http.Server {
+func startServer(userService app.UserService, logger log.Logger) (*http.Server, error) {
+	handler, err := transport.NewHTTPHandler(userService, logger)
+	if err != nil {
+		return nil, err
+	}
 	srv := &http.Server{
 		Addr:    ":8080",
-		Handler: transport.NewHTTPHandler(userService, logger),
+		Handler: handler,
 	}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
 			logger.WithError(err).Fatal("unable to start the server")
 		}
 	}()
-	return srv
+	return srv, nil
 }
 
 func listenOSKillSignals() {
