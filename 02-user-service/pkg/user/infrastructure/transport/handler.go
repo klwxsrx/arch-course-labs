@@ -159,8 +159,10 @@ func getHandlerFunc(userService app.UserService, handler requestHandlerFunc, log
 	return func(w http.ResponseWriter, r *http.Request) {
 		result, err := handler(r, userService)
 		if err != nil {
-			logger.WithError(err).Error("failed to handle request")
 			httpCode := translateError(err)
+			if httpCode == http.StatusInternalServerError {
+				logger.WithError(err).Error("failed to handle request")
+			}
 			w.WriteHeader(httpCode)
 			return
 		}
