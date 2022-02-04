@@ -10,6 +10,3 @@ helm install nginx ingress-nginx/ingress-nginx -f ingress-nginx.values.yaml --at
 
 # Install user service
 helm install user-service ../02-user-service/helm/ --namespace user-service --create-namespace
-
-# Install grafana dashboard for the service
-kubectl apply -f ./grafana.yaml
