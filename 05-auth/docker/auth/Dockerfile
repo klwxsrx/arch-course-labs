@@ -9,8 +9,8 @@ FROM scratch
 COPY --from=builder /etc/passwd /etc/passwd
 USER appuser
 
-COPY ./bin/user /app/bin/userservice
+COPY ./bin/auth /app/bin/app
 
 EXPOSE 8080
 
-CMD ["/app/bin/userservice"]
+CMD ["/app/bin/app"]

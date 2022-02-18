@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+  namespace: user
+spec:
+  selector:
+    app: auth
+  ports:
+    - port: 8080
+      targetPort: web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: userprofile
+  namespace: user
+spec:
+  selector:
+    app: userprofile
+  ports:
+    - port: 8080
+      targetPort: web

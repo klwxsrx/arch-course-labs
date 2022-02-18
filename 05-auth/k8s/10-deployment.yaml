@@ -1,0 +1,47 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: user
+  name: auth
+  labels:
+    app: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth
+          image: klwxsrx/arch-course-labs-05-auth-service
+          ports:
+            - name: web
+              containerPort: 8080
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: user
+  name: userprofile
+  labels:
+    app: userprofile
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: userprofile
+  template:
+    metadata:
+      labels:
+        app: userprofile
+    spec:
+      containers:
+        - name: whoami
+          image: containous/whoami
+          ports:
+            - name: web
+              containerPort: 80

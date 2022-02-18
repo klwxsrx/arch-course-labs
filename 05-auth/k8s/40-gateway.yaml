@@ -1,0 +1,34 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: auth
+  namespace: user
+spec:
+  forwardAuth:
+    address: auth.user.svc.cluster.local/auth
+    authResponseHeaders:
+      - X-Auth-User-ID
+      - X-Auth-User-Login
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: user
+  namespace: user
+spec:
+  routes:
+    - kind: Rule
+      match: PathPrefix(`/`)
+      services:
+        - name: userprofile
+          namespace: user
+          port: 8080
+      middlewares:
+        - name: auth
+          namespace: user
+    - kind: Rule
+      match: PathPrefix(`/auth`)
+      services:
+        - name: auth
+          namespace: user
+          port: 8080
