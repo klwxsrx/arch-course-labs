@@ -25,17 +25,17 @@ type UserService struct {
 	pwdEncoder PasswordEncoder
 }
 
-func (s *UserService) Register(login, password string) error {
+func (s *UserService) Register(login, password string) (uuid.UUID, error) {
 	_, err := s.repo.GetByLogin(login)
 	if err != nil && !errors.Is(err, ErrUserByLoginNotExists) {
-		return err
+		return uuid.Nil, err
 	} else if err == nil {
-		return ErrUserByLoginAlreadyExists
+		return uuid.Nil, ErrUserByLoginAlreadyExists
 	}
 
 	encodedPassword, err := s.pwdEncoder.Encode(password)
 	if err != nil {
-		return err
+		return uuid.Nil, err
 	}
 	user := &User{
 		ID:              s.repo.NextID(),
@@ -43,7 +43,7 @@ func (s *UserService) Register(login, password string) error {
 		EncodedPassword: encodedPassword,
 	}
 
-	return s.repo.Store(user)
+	return user.ID, s.repo.Store(user)
 }
 
 func NewUserService(repo UserRepository, pwdEncoder PasswordEncoder) *UserService {

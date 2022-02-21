@@ -1,0 +1,670 @@
+{
+	"info": {
+		"_postman_id": "25254400-4984-4319-93eb-5c233eb1ba36",
+		"name": "Test Auth",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register #1 user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Request:\");",
+							"pm.request.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"console.log(\"Body: \" + pm.request.body.raw);",
+							"console.log(\"\");",
+							"console.log(\"Response:\");",
+							"pm.response.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"console.log(\"Body: \" + JSON.stringify(pm.response.json()));",
+							"",
+							"pm.test(\"Registered successfully\", function() {",
+							"    pm.response.to.have.status(200);",
+							"",
+							"    var jsonResult = pm.response.json();",
+							"    pm.collectionVariables.set(\"userID1\", jsonResult);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"userLogin1\", pm.variables.replaceIn(\"{{$randomEmail}}\"));",
+							"pm.collectionVariables.set(\"userPassword1\", pm.variables.replaceIn(\"{{$randomPassword}}\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"login\": \"{{userLogin1}}\",\n  \"password\": \"{{userPassword1}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/register",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user #1 profile",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Request:\");",
+							"pm.request.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"",
+							"pm.test(\"User is unauthenticated\", function() {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/profile/{{userID1}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"profile",
+						"{{userID1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update user #1 profile",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Request:\");",
+							"pm.request.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"console.log(\"Body: \" + pm.request.body.raw);",
+							"",
+							"pm.test(\"User is unauthenticated\", function() {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"first_name\": \"{{$randomFirstName}}\",\n  \"last_name\": \"{{$randomLastName}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/profile/{{userID1}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"profile",
+						"{{userID1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login as user #1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Request:\");",
+							"pm.request.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"console.log(\"Body: \" + pm.request.body.raw);",
+							"console.log(\"\");",
+							"console.log(\"Response:\");",
+							"pm.response.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"",
+							"pm.test(\"Status code is 204\", function() {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"login\": \"{{userLogin1}}\",\n  \"password\": \"{{userPassword1}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/login",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update user #1 profile when logged",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Request:\");",
+							"pm.request.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"console.log(\"Body: \" + pm.request.body.raw);",
+							"",
+							"pm.test(\"Has status 204\", function() {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"userFirstName1\", pm.variables.replaceIn(\"{{$randomFirstName}}\"));",
+							"pm.collectionVariables.set(\"userLastName1\", pm.variables.replaceIn(\"{{$randomLastName}}\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"first_name\": \"{{userFirstName1}}\",\n  \"last_name\": \"{{userLastName1}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/profile/{{userID1}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"profile",
+						"{{userID1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user #1 profile when logged",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Request:\");",
+							"pm.request.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"console.log(\"\");",
+							"console.log(\"Response:\");",
+							"pm.response.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"console.log(\"Body: \" + JSON.stringify(pm.response.json()));",
+							"",
+							"pm.test(\"Has status 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Has specified profile values\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.first_name).to.eql(pm.collectionVariables.get(\"userFirstName1\"));",
+							"    pm.expect(jsonData.last_name).to.eql(pm.collectionVariables.get(\"userLastName1\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/profile/{{userID1}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"profile",
+						"{{userID1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout user #1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Request:\");",
+							"pm.request.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"console.log(\"\");",
+							"console.log(\"Response:\");",
+							"pm.response.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"",
+							"pm.test(\"Has status 204\", function() {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/logout",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register #2 user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Request:\");",
+							"pm.request.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"console.log(\"Body: \" + pm.request.body.raw);",
+							"console.log(\"\");",
+							"console.log(\"Response:\");",
+							"pm.response.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"console.log(\"Body: \" + JSON.stringify(pm.response.json()));",
+							"",
+							"pm.test(\"Registered successfully\", function() {",
+							"    pm.response.to.have.status(200);",
+							"",
+							"    var jsonResult = pm.response.json();",
+							"    pm.collectionVariables.set(\"userID2\", jsonResult);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"userLogin2\", pm.variables.replaceIn(\"{{$randomEmail}}\"));",
+							"pm.collectionVariables.set(\"userPassword2\", pm.variables.replaceIn(\"{{$randomPassword}}\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"login\": \"{{userLogin2}}\",\n  \"password\": \"{{userPassword2}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/register",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login as user #2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Request:\");",
+							"pm.request.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"console.log(\"Body: \" + pm.request.body.raw);",
+							"console.log(\"\");",
+							"console.log(\"Response:\");",
+							"pm.response.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"",
+							"pm.test(\"Status code is 204\", function() {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"login\": \"{{userLogin2}}\",\n  \"password\": \"{{userPassword2}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/login",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user #1 profile when logged",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Request:\");",
+							"pm.request.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"",
+							"pm.test(\"Get another user profile is forbidden\", function() {",
+							"    pm.response.to.have.status(403);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/profile/{{userID1}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"profile",
+						"{{userID1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update user #1 profile when logged",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Request:\");",
+							"pm.request.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"console.log(\"Body: \" + pm.request.body.raw);",
+							"",
+							"pm.test(\"Update another user profile is forbidden\", function() {",
+							"    pm.response.to.have.status(403);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"first_name\": \"TestFirst2\",\n  \"last_name\": \"TestLast2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/profile/{{userID1}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"profile",
+						"{{userID1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout user #2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Request:\");",
+							"pm.request.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"console.log(\"\");",
+							"console.log(\"Response:\");",
+							"pm.response.headers.each(function(header) {",
+							"    console.log(header.key + \": \" + header.value);",
+							"});",
+							"",
+							"pm.test(\"Has status 204\", function() {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/logout",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "arch.homework",
+			"type": "string"
+		},
+		{
+			"key": "userID1",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userLogin1",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userPassword1",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userFirstName1",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userLastName1",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userID2",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userLogin2",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userPassword2",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

@@ -19,3 +19,8 @@ helm install --version "10.14.1" \
 ```shell
 kubectl apply -f ./k8s
 ```
+
+# Запуск тестов
+```shell
+newman run ./Tests.postman_collection.json
+```

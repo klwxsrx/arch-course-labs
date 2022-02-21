@@ -79,13 +79,13 @@ func registerHandler(userService *app.UserService, _ *auth.SessionService, w htt
 		return
 	}
 
-	err = userService.Register(credentials.Login, credentials.Password)
+	userID, err := userService.Register(credentials.Login, credentials.Password)
 	if errors.Is(err, app.ErrUserByLoginAlreadyExists) {
 		w.WriteHeader(http.StatusConflict)
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
-		w.WriteHeader(http.StatusNoContent)
+		_ = json.NewEncoder(w).Encode(userID.String())
 	}
 }
 
