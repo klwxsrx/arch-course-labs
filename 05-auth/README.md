@@ -1,5 +1,5 @@
 # Установка
-## Добавим ingress в minikube
+## Добавить ingress в minikube
 ```shell
 minikube addons enable ingress
 ```

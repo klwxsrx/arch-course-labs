@@ -5,7 +5,7 @@ metadata:
   namespace: user
 spec:
   forwardAuth:
-    address: auth.user.svc.cluster.local/auth
+    address: http://auth.user.svc.cluster.local:8080/auth
     authResponseHeaders:
       - X-Auth-User-ID
       - X-Auth-User-Login
@@ -18,7 +18,8 @@ metadata:
 spec:
   routes:
     - kind: Rule
-      match: PathPrefix(`/`)
+      match: PathPrefix(`/profile`)
+      priority: 1
       services:
         - name: userprofile
           namespace: user
@@ -28,6 +29,7 @@ spec:
           namespace: user
     - kind: Rule
       match: PathPrefix(`/auth`)
+      priority: 2
       services:
         - name: auth
           namespace: user

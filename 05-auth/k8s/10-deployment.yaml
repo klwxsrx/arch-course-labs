@@ -40,8 +40,8 @@ spec:
         app: userprofile
     spec:
       containers:
-        - name: whoami
-          image: containous/whoami
+        - name: userprofile
+          image: klwxsrx/arch-course-labs-05-userprofile-service
           ports:
             - name: web
-              containerPort: 80
+              containerPort: 8080
