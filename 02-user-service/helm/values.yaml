@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: klwxsrx/arch-course-labs-userservice
+  repository: klwxsrx/arch-course-labs-02-user-service
 
 service:
   type: ClusterIP

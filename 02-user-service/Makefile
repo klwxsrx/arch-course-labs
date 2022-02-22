@@ -11,4 +11,4 @@ build:
 	GOARCH=amd64 GOOS=linux CGO_ENABLED=0 go build -o ./bin/user ./cmd/user
 
 docker-image:
-	docker build -f docker/Dockerfile -t klwxsrx/arch-course-labs-userservice:$(APP_VERSION) .
+	docker build -f docker/Dockerfile -t klwxsrx/arch-course-labs-02-user-service:$(APP_VERSION) .
