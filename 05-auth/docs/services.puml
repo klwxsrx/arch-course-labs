@@ -1,0 +1,30 @@
+@startuml
+skinparam defaultTextAlignment center
+
+actor User [
+    Frontend
+]
+
+component Auth [
+    Auth Service
+]
+
+component UserProfile [
+    UserProfile Service
+]
+
+cloud APIGateway [
+    Api Gateway
+    (Traefik)
+]
+
+User -right-> APIGateway
+
+Auth -[hidden]down- UserProfile
+
+APIGateway -right-> Auth: GET /auth
+APIGateway <.right. Auth: X-Auth-User-ID: ...\nX-Auth-User-Login: ...
+
+APIGateway -right-> UserProfile: PUT /profile/123e4567-...\n X-Auth-User-ID: ...\nX-Auth-User-Login: ...
+
+@enduml
