@@ -1,5 +1,6 @@
 # Техническое решение
 ![docs/services.puml](http://www.plantuml.com/plantuml/proxy?fmt=svg&src=https://raw.githubusercontent.com/klwxsrx/arch-course-labs/master/05-auth/docs/services.puml)
+
 В качестве APIGateway используется Traefik.
 
 Сервис `Auth` отвечает за регистрацию и авторизацию пользователей.
