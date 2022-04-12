@@ -4,3 +4,132 @@ info:
   version: 1.0.0
 defaultContentType: application/json
 channels:
+  Gateway/RegistrationRequested:
+    publish:
+      message:
+        $ref: '#/components/messages/RegistrationRequested'
+  Gateway/CreateOrderRequested:
+    publish:
+      message:
+        $ref: '#/components/messages/CreateOrderRequested'
+  User/UserRegistered:
+    publish:
+      message:
+        $ref: '#/components/messages/UserRegistered'
+  Order/OrderCreated:
+    publish:
+      message:
+        $ref: '#/components/messages/OrderCreated'
+  Order/OrderPaymentRequested:
+    publish:
+      message:
+        $ref: '#/components/messages/OrderPaymentRequested'
+  Order/OrderCompleted:
+    publish:
+      message:
+        $ref: '#/components/messages/OrderCompleted'
+  Order/OrderCancelled:
+    publish:
+      message:
+        $ref: '#/components/messages/OrderCancelled'
+  Billing/OrderPaid:
+    publish:
+      message:
+        $ref: '#/components/messages/OrderPaid'
+  Billing/OrderPaymentRefused:
+    publish:
+      message:
+        $ref: '#/components/messages/OrderPaymentRefused'
+components:
+  messages:
+    RegistrationRequested:
+      name: RegistrationRequested
+      payload:
+        properties:
+          email:
+            type: string
+            format: email
+          password:
+            type: string
+    UserRegistered:
+      name: UserRegistered
+      payload:
+        properties:
+          id:
+            type: string
+            format: uuid
+          email:
+            type: string
+            format: email
+    CreateOrderRequested:
+      name: CreateOrderRequested
+      payload:
+        type: array
+        items:
+          properties:
+            itemID:
+              type: string
+              format: uuid
+            price:
+              type: integer
+    OrderCreated:
+      name: OrderCreated
+      payload:
+        properties:
+          id:
+            type: string
+            format: uuid
+          items:
+            type: array
+            items:
+              properties:
+                itemID:
+                  type: string
+                  format: uuid
+                price:
+                  type: integer
+          totalAmount:
+            type: integer
+    OrderPaymentRequested:
+      name: OrderPaymentRequested
+      payload:
+        properties:
+          id:
+            type: string
+            format: uuid
+          totalAmount:
+            type: integer
+    OrderPaid:
+      name: OrderPaid
+      payload:
+        properties:
+          id:
+            type: string
+            format: uuid
+          totalAmount:
+            type: integer
+    OrderPaymentRefused:
+      name: OrderPaymentRefused
+      payload:
+        properties:
+          id:
+            type: string
+            format: uuid
+          reason:
+            type: string
+    OrderCompleted:
+      name: OrderCompleted
+      payload:
+        properties:
+          id:
+            type: string
+            format: uuid
+    OrderCancelled:
+      name: OrderCancelled
+      payload:
+        properties:
+          id:
+            type: string
+            format: uuid
+          reason:
+            type: string
