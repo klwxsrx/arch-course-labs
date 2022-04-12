@@ -1,0 +1,106 @@
+@startuml
+skinparam sequenceMessageAlign center
+
+participant Frontend
+
+participant Gateway
+
+participant Message [
+Message Bus
+]
+
+participant User [
+User Service
+]
+
+participant Order [
+Order Service
+]
+
+participant Billing [
+Billing Service
+]
+
+participant Notification [
+Notification Service
+]
+
+== Регистрация пользователя ==
+
+Frontend -> Gateway: PUT /users\n(RegisterUser)
+activate Gateway
+
+Gateway --> Message: RegistrationRequested
+activate Message
+
+Message --> User: RegistrationRequested
+activate User
+
+User --> Message: UserRegistered
+deactivate User
+
+Message --> Gateway: UserRegistered
+
+Frontend <-- Gateway: 201 Created
+deactivate Gateway
+
+Message --> Billing: UserRegistered
+activate Billing
+
+Billing -> Billing: Create Account
+deactivate Billing
+
+Message --> Notification: UserRegistered
+deactivate Message
+activate Notification
+
+Notification -> Notification: Create Notification Data
+deactivate Notification
+
+== Создание заказа ==
+
+Frontend -> Gateway: PUT /orders\n(Order)
+activate Gateway
+
+Gateway --> Message: OrderRequested
+activate Message
+
+Message --> Order: OrderRequested
+activate Order
+
+Order --> Message: OrderCreated
+
+Order --> Message: OrderPaymentRequested
+deactivate Order
+
+Gateway <-- Message: Order Created
+
+Frontend <-- Gateway: 204 No Content
+deactivate Gateway
+
+Message --> Notification: OrderCreated
+activate Notification
+
+Notification -> Notification: Create Order Info
+deactivate Notification
+
+Message --> Billing: OrderPaymentRequested
+activate Billing
+
+Billing --> Message: OrderPaid или OrderPaymentRefused
+deactivate Billing
+
+Message --> Order: OrderPaid или OrderPaymentRefused
+activate Order
+
+Order --> Message: OrderCompleted или OrderCancelled
+deactivate Order
+
+Message --> Notification: OrderCompleted или OrderCancelled
+deactivate Message
+activate Notification
+
+Notification -> Notification: Send Email
+deactivate Notification
+
+@enduml

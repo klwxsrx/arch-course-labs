@@ -1,0 +1,124 @@
+openapi: 3.0.0
+info:
+  title: Store
+  version: 1.0.0
+paths:
+  /users:
+    put:
+      operationId: RegisterUser
+      summary: RegisterUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUserRequest"
+        required: true
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterUserResponse"
+        400:
+          description: Invalid data
+      tags:
+        - Gateway
+  /user/{userID}:
+    get:
+      operationId: GetUser
+      summary: GetUser
+      parameters:
+        - name: userID
+          in: path
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserResponse"
+        404:
+          description: User not found
+      tags:
+        - User
+  /order/{orderID}:
+    get:
+      operationId: GetOrder
+      summary: GetOrder
+      parameters:
+        - name: orderID
+          in: path
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetOrderResponse"
+        404:
+          description: Order not found
+      tags:
+        - Order
+components:
+  schemas:
+    RegisterUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - email
+        - password
+    RegisterUserResponse:
+      type: string
+      format: uuid
+    GetUserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+      required:
+        - id
+        - email
+    GetOrderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userID:
+          type: string
+          format: uuid
+        totalAmount:
+          type: integer
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+            required:
+              - id
+      required:
+        - id
+        - userID
+        - totalAmount
+        - items

@@ -1,0 +1,112 @@
+@startuml
+skinparam sequenceMessageAlign center
+
+participant Frontend
+
+participant Gateway
+
+participant Message [
+Message Bus
+]
+
+participant User [
+User Service
+]
+
+participant Order [
+Order Service
+]
+
+participant Billing [
+Billing Service
+]
+
+participant Notification [
+Notification Service
+]
+
+== Регистрация пользователя ==
+
+Frontend -> Gateway: PUT /users\n(RegisterUser)
+activate Gateway
+
+Gateway --> Message: RegistrationRequested
+activate Message
+
+Message --> User: RegistrationRequested
+activate User
+
+User --> Message: UserRegistered
+deactivate User
+
+Message --> Gateway: UserRegistered
+
+Frontend <-- Gateway: 201 Created
+deactivate Gateway
+
+Message --> Billing: UserRegistered
+deactivate Message
+activate Billing
+
+Billing -> Billing: Create Account
+deactivate Billing
+
+== Создание заказа ==
+
+Frontend -> Gateway: PUT /orders\n(CreateOrder)
+activate Gateway
+
+Gateway --> Message: CreateOrderRequested
+activate Message
+
+Message --> Order: CreateOrderRequested
+activate Order
+
+Order --> Message: OrderCreated
+
+Order --> Message: OrderPaymentRequested
+deactivate Order
+
+Message --> Gateway: OrderCreated
+
+Frontend <-- Gateway: 201 Created
+deactivate Gateway
+
+Message --> Billing: OrderPaymentRequested
+activate Billing
+
+Billing -> Order: GET /order/{orderID}\nGetOrder
+activate Order
+
+Billing <-- Order: 200 OK
+deactivate Order
+
+Billing --> Message: OrderPaid или OrderPaymentRefused
+deactivate Billing
+
+Message --> Order: OrderPaid или OrderPaymentRefused
+activate Order
+
+Order --> Message: OrderCompleted или OrderCancelled
+deactivate Order
+
+Message --> Notification: OrderCompleted или OrderCancelled
+deactivate Message
+activate Notification
+
+Notification -> Order: GET /order/{orderID}\nGetOrder
+activate Order
+
+Notification <-- Order: 200 OK
+deactivate Order
+
+Notification -> User: GET /user/{userID}\nGetUser
+activate User
+
+Notification <-- User: 200 OK
+deactivate User
+
+Notification -> Notification: Send Email
+deactivate Notification
+
+@enduml

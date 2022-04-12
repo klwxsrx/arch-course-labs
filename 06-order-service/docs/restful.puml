@@ -1,0 +1,59 @@
+@startuml
+skinparam sequenceMessageAlign center
+
+participant Gateway [
+API Gateway
+]
+
+participant User [
+User Service
+]
+
+participant Order [
+Order Service
+]
+
+participant Billing [
+Billing Service
+]
+
+participant Notification [
+Notification Service
+]
+
+== Регистрация пользователя ==
+
+Gateway -> User: PUT /users\n(RegisterUser)
+activate User
+
+User -> Billing: PUT /accounts\n(CreateAccount)
+activate Billing
+
+User <-- Billing: 201 Created
+deactivate Billing
+
+Gateway <-- User: 201 Created
+deactivate User
+
+== Создание заказа ==
+Gateway -> Order: PUT /orders\n(CreateOrder)
+activate Order
+
+Order -> Billing: POST /account/{userID}/order/{orderID}\n(PayOrder)
+activate Billing
+
+Order <-- Billing: 204 No Content или 406 Not Acceptable
+deactivate Billing
+
+Order -> Notification: POST /notification/mail\n(SendMail)
+activate Notification
+
+Order <-- Notification: 204 No Content
+
+Notification -> Notification: Send Email
+deactivate Notification
+
+Gateway <-- Order: 201 Created
+deactivate Order
+
+@enduml

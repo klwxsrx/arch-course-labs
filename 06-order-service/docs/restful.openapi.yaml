@@ -1,0 +1,181 @@
+openapi: 3.0.0
+info:
+  title: Store
+  version: 1.0.0
+paths:
+  /users:
+    put:
+      operationId: RegisterUser
+      summary: RegisterUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUserRequest"
+        required: true
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterUserResponse"
+        400:
+          description: Invalid data
+      tags:
+        - User
+  /orders:
+    put:
+      operationId: CreateOrder
+      summary: CreateOrder
+      parameters:
+        - name: X-Auth-User-ID
+          in: header
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderRequest"
+        required: true
+      responses:
+        201:
+          description: Successful response
+        400:
+          description: Invalid data
+      tags:
+        - Order
+  /accounts:
+    put:
+      operationId: CreateAccount
+      summary: CreateAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAccountRequest"
+        required: true
+      responses:
+        201:
+          description: Successful response
+        400:
+          description: Invalid data
+      tags:
+        - Billing
+  /account/{userID}/order/{orderID}:
+    post:
+      operationId: PayOrder
+      summary: PayOrder
+      parameters:
+        - name: userID
+          in: path
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - name: orderID
+          in: path
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PayOrderRequest"
+        required: true
+      responses:
+        204:
+          description: Successful response
+        400:
+          description: Invalid data
+        406:
+          description: Insufficient funds
+      tags:
+        - Billing
+  /notification/mail:
+    post:
+      operationId: SendMail
+      summary: SendMail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMailRequest"
+        required: true
+      responses:
+        204:
+          description: Successful response
+        400:
+          description: Invalid data
+      tags:
+        - Notification
+components:
+  schemas:
+    RegisterUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - email
+        - password
+    RegisterUserResponse:
+      type: string
+      format: uuid
+    CreateOrderRequest:
+      type: array
+      items:
+        type: object
+        properties:
+          itemID:
+            type: string
+            format: uuid
+          price:
+            type: integer
+        required:
+          - itemID
+          - price
+    CreateAccountRequest:
+      type: object
+      properties:
+        userID:
+          type: string
+          format: uuid
+        initialBalance:
+          type: integer
+      required:
+        - userID
+        - initialBalance
+    PayOrderRequest:
+      type: object
+      properties:
+        totalAmount:
+          type: integer
+      required:
+        - totalAmount
+    SendMailRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        templateID:
+          type: string
+          enum:
+            - order_paid
+            - order_rejected_insufficent_funds
+        data:
+          type: string
+          format: json
+      required:
+        - email
+        - templateID
+        - data
