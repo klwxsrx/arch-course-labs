@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: order
+  name: order-config
+data:
+  mysql-host: order-db-mysql
+  mysql-port: "3306"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: order
+  name: order-db-access
+type: Opaque
+stringData:
+  mysql-database: order
+  mysql-user: user
+  mysql-password: test1234

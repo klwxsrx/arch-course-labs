@@ -1,0 +1,219 @@
+{
+	"info": {
+		"_postman_id": "03dff538-51de-4bda-a307-74375c7070c9",
+		"name": "Test Idempotent Call",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"X-Idempotence-Key: \" + pm.request.headers.get(\"X-Idempotence-Key\"))",
+							"",
+							"pm.test(\"Order created\", function() {",
+							"    pm.response.to.have.status(201);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var uuid = require('uuid');",
+							"pm.collectionVariables.set(\"IdempotenceKey\", pm.variables.replaceIn(uuid.v4()));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-Auth-User-ID",
+						"value": "08f30a90-2fc3-45c5-a2e2-c7d3a96087c5",
+						"type": "text"
+					},
+					{
+						"key": "X-Idempotence-Key",
+						"value": "{{IdempotenceKey}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"items\": [\n        {\n            \"id\": \"25eeafee-2b49-431c-97a6-ffaf29b2e5ab\",\n            \"item_price\": 100000,\n            \"quantity\": 3\n        },\n        {\n            \"id\": \"eb218b05-b8c6-475a-9a9e-4231d4c73ad1\",\n            \"item_price\": 54000,\n            \"quantity\": 1\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create order with the same IdempotenceKey",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"X-Idempotence-Key: \" + pm.request.headers.get(\"X-Idempotence-Key\"))",
+							"",
+							"pm.test(\"Order duplicated\", function() {",
+							"    pm.response.to.have.status(409);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-Auth-User-ID",
+						"value": "08f30a90-2fc3-45c5-a2e2-c7d3a96087c5",
+						"type": "text"
+					},
+					{
+						"key": "X-Idempotence-Key",
+						"value": "{{IdempotenceKey}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"items\": [\n        {\n            \"id\": \"25eeafee-2b49-431c-97a6-ffaf29b2e5ab\",\n            \"item_price\": 100000,\n            \"quantity\": 3\n        },\n        {\n            \"id\": \"eb218b05-b8c6-475a-9a9e-4231d4c73ad1\",\n            \"item_price\": 54000,\n            \"quantity\": 1\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create order with new IdempotenceKey",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"X-Idempotence-Key: \" + pm.request.headers.get(\"X-Idempotence-Key\"))",
+							"",
+							"pm.test(\"Order created\", function() {",
+							"    pm.response.to.have.status(201);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var uuid = require('uuid');",
+							"pm.collectionVariables.set(\"IdempotenceKey\", pm.variables.replaceIn(uuid.v4()));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-Auth-User-ID",
+						"value": "08f30a90-2fc3-45c5-a2e2-c7d3a96087c5",
+						"type": "text"
+					},
+					{
+						"key": "X-Idempotence-Key",
+						"value": "{{IdempotenceKey}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"items\": [\n        {\n            \"id\": \"25eeafee-2b49-431c-97a6-ffaf29b2e5ab\",\n            \"item_price\": 100000,\n            \"quantity\": 3\n        },\n        {\n            \"id\": \"eb218b05-b8c6-475a-9a9e-4231d4c73ad1\",\n            \"item_price\": 54000,\n            \"quantity\": 1\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "arch.homework",
+			"type": "string"
+		},
+		{
+			"key": "IdempotenceKey",
+			"value": ""
+		}
+	]
+}

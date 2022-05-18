@@ -1,0 +1,53 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: order
+  name: order
+  labels:
+    app: order
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+        - name: order
+          image: klwxsrx/arch-course-labs-07-order-service
+          env:
+            - name: DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: mysql-host
+            - name: DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: order-config
+                  key: mysql-port
+            - name: DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: order-db-access
+                  key: mysql-database
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: order-db-access
+                  key: mysql-user
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: order-db-access
+                  key: mysql-password
+          ports:
+            - name: web
+              containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
