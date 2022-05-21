@@ -1,0 +1,29 @@
+@startuml
+
+activate Order
+
+Order -> Payment: AuthorizeOrder
+activate Payment
+
+Order <-- Payment: OrderAuthorized
+deactivate Payment
+
+Order -> Stock: ReserveOrderItems
+activate Stock
+
+Order <-- Stock: OrderItemsReserved
+deactivate Stock
+
+Order -> Payment: CompleteTransaction
+activate Payment
+
+Order <-- Payment: TransactionCompleted
+deactivate Payment
+
+Order -> Delivery: ScheduleDelivery
+activate Delivery
+
+Order <-- Delivery: DeliveryScheduled
+deactivate Delivery
+
+@enduml

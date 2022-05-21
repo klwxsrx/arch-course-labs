@@ -1,0 +1,46 @@
+package saga
+
+import (
+	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/log"
+	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/saga"
+	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/app/service/api"
+	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/domain"
+)
+
+type scheduleDeliveryOperation struct {
+	deliveryAPI api.DeliveryAPI
+	order       *domain.Order
+	logger      log.Logger
+}
+
+func (op *scheduleDeliveryOperation) Name() string {
+	return "scheduleDelivery"
+}
+
+func (op *scheduleDeliveryOperation) Do() error {
+	err := op.deliveryAPI.ScheduleDelivery()
+	if err != nil {
+		op.logger.With(log.Fields{
+			"orderID": op.order.ID,
+		}).WithError(err).Error("failed to schedule order delivery")
+		return err
+	}
+	return nil
+}
+
+func (op *scheduleDeliveryOperation) Undo() error {
+	// do nothing
+	return nil
+}
+
+func NewScheduleDeliveryOperation(
+	deliveryAPI api.DeliveryAPI,
+	order *domain.Order,
+	logger log.Logger,
+) saga.Operation {
+	return &scheduleDeliveryOperation{
+		deliveryAPI: deliveryAPI,
+		order:       order,
+		logger:      logger,
+	}
+}
