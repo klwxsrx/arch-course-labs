@@ -40,10 +40,10 @@ func (s *OrderService) Create(
 	}
 
 	processOrderSaga := saga.New(fmt.Sprintf("ProcessOrder_%v", order.ID), []saga.Operation{
-		orderSaga.NewAuthorizeOrderOperation(s.paymentAPI, order, s.logger),
+		orderSaga.NewAuthorizeOrderPaymentOperation(s.paymentAPI, order, s.logger),
 		orderSaga.NewReserveOrderItemsOperation(s.stockAPI, order, s.logger),
-		orderSaga.NewCompleteTransactionOperation(s.paymentAPI, order.ID, s.logger),
 		orderSaga.NewScheduleDeliveryOperation(s.deliveryAPI, order, s.logger),
+		orderSaga.NewCompletePaymentTransactionOperation(s.paymentAPI, order.ID, s.logger),
 	}, s.logger)
 
 	err = processOrderSaga.Execute()

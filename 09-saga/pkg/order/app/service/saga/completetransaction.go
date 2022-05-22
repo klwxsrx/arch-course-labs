@@ -7,17 +7,17 @@ import (
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/app/service/api"
 )
 
-type completeTransactionOperation struct {
+type completePaymentTransactionOperation struct {
 	paymentAPI api.PaymentAPI
 	orderID    uuid.UUID
 	logger     log.Logger
 }
 
-func (op *completeTransactionOperation) Name() string {
-	return "completeTransaction"
+func (op *completePaymentTransactionOperation) Name() string {
+	return "completePaymentTransaction"
 }
 
-func (op *completeTransactionOperation) Do() error {
+func (op *completePaymentTransactionOperation) Do() error {
 	err := op.paymentAPI.CompleteTransaction(op.orderID)
 	if err != nil {
 		op.logger.With(log.Fields{
@@ -28,23 +28,17 @@ func (op *completeTransactionOperation) Do() error {
 	return nil
 }
 
-func (op *completeTransactionOperation) Undo() error {
-	err := op.paymentAPI.RefundOrder(op.orderID)
-	if err != nil {
-		op.logger.With(log.Fields{
-			"orderID": op.orderID,
-		}).WithError(err).Error("failed to refund order")
-		return err
-	}
+func (op *completePaymentTransactionOperation) Undo() error {
+	// do nothing
 	return nil
 }
 
-func NewCompleteTransactionOperation(
+func NewCompletePaymentTransactionOperation(
 	paymentAPI api.PaymentAPI,
 	orderID uuid.UUID,
 	logger log.Logger,
 ) saga.Operation {
-	return &completeTransactionOperation{
+	return &completePaymentTransactionOperation{
 		paymentAPI: paymentAPI,
 		orderID:    orderID,
 		logger:     logger,

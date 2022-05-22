@@ -95,30 +95,6 @@ func (a *apiClient) CancelOrder(orderID uuid.UUID) error {
 	}
 }
 
-func (a *apiClient) RefundOrder(orderID uuid.UUID) error {
-	url := fmt.Sprintf("%s/payment/%v/refund", a.serviceURL, orderID)
-	req, err := http.NewRequest(http.MethodPost, url, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
-	}
-
-	resp, err := a.client.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to execute http request: %w", err)
-	}
-
-	switch resp.StatusCode {
-	case http.StatusNoContent:
-		return nil
-	case http.StatusNotFound:
-		return api.ErrOrderPaymentNotFound
-	case http.StatusMethodNotAllowed:
-		return api.ErrOrderPaymentNotCompleted
-	default:
-		return fmt.Errorf("failed to refundOrder, httpCode: %v", resp.StatusCode)
-	}
-}
-
 func New(serviceURL string) api.PaymentAPI {
 	return &apiClient{
 		client:     &http.Client{},

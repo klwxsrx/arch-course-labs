@@ -9,6 +9,12 @@ type apiClient struct {
 	serviceURL string
 }
 
+func (a *apiClient) DeleteDeliverySchedule() error {
+	//TODO implement me
+	fmt.Println("delete delivery schedule")
+	return nil
+}
+
 func (a *apiClient) ScheduleDelivery() error {
 	//TODO implement me
 	fmt.Println("schedule delivery")

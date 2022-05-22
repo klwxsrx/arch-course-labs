@@ -48,12 +48,6 @@ func getRoutes() []route {
 			cancelPaymentHandler,
 		},
 		{
-			"refundPayment",
-			http.MethodPost,
-			"/payment/{orderID}/refund",
-			refundPaymentHandler,
-		},
-		{
 			"health",
 			http.MethodGet,
 			"/healthz",
@@ -175,29 +169,6 @@ func cancelPaymentHandler(srv *service.PaymentService, _ query.PaymentQueryServi
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func refundPaymentHandler(srv *service.PaymentService, _ query.PaymentQueryService, w http.ResponseWriter, r *http.Request) {
-	orderID, err := parseUUID(mux.Vars(r)["orderID"])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	err = srv.RefundOrder(orderID)
-	if errors.Is(err, service.ErrPaymentNotFound) {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-	if errors.Is(err, service.ErrPaymentNotCompleted) {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusNoContent)
-}
-
 func healthCheckHandler(_ *service.PaymentService, _ query.PaymentQueryService, w http.ResponseWriter, _ *http.Request) {
 	_ = json.NewEncoder(w).Encode(struct {
 		Status string `json:"status"`
@@ -212,8 +183,8 @@ func getTextStatus(status domain.PaymentStatus) (string, error) {
 		return "cancelled", nil
 	case domain.PaymentStatusCompleted:
 		return "completed", nil
-	case domain.PaymentStatusRefunded:
-		return "refunded", nil
+	case domain.PaymentStatusRejected:
+		return "rejected", nil
 	default:
 		return "", errors.New(fmt.Sprintf("unknown status %v", status))
 	}

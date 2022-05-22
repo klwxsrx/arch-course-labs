@@ -11,7 +11,7 @@ const (
 	PaymentStatusAuthorized PaymentStatus = iota
 	PaymentStatusCancelled
 	PaymentStatusCompleted
-	PaymentStatusRefunded
+	PaymentStatusRejected
 )
 
 type Payment struct {

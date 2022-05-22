@@ -11,7 +11,6 @@ import (
 var (
 	ErrPaymentNotFound      = errors.New("payment not found")
 	ErrPaymentNotAuthorized = errors.New("payment not authorized")
-	ErrPaymentNotCompleted  = errors.New("payment not completed")
 )
 
 type PaymentService struct {
@@ -111,40 +110,6 @@ func (s *PaymentService) CancelPayment(orderID uuid.UUID) error {
 		s.logger.WithError(err).With(log.Fields{
 			"orderID": orderID,
 		}).Error("failed to cancel payment")
-		return err
-	}
-	return nil
-}
-
-func (s *PaymentService) RefundOrder(orderID uuid.UUID) error {
-	err := s.ufw.Execute(func(p persistence.PersistentProvider) error {
-		// TODO: refund payment from payment gateway
-
-		payment, err := p.PaymentRepository().GetByID(orderID)
-		if errors.Is(err, domain.ErrPaymentNotFound) {
-			return ErrPaymentNotFound
-		}
-		if err != nil {
-			return err
-		}
-
-		if payment.Status == domain.PaymentStatusRefunded {
-			return nil
-		}
-		if payment.Status != domain.PaymentStatusCompleted {
-			return ErrPaymentNotCompleted
-		}
-
-		payment.Status = domain.PaymentStatusRefunded
-		return p.PaymentRepository().Store(payment)
-	})
-	if errors.Is(err, ErrPaymentNotFound) || errors.Is(err, ErrPaymentNotCompleted) {
-		return nil
-	}
-	if err != nil {
-		s.logger.WithError(err).With(log.Fields{
-			"orderID": orderID,
-		}).Error("failed to refund payment")
 		return err
 	}
 	return nil
