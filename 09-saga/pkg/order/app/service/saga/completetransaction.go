@@ -30,14 +30,14 @@ func (op *completeTransactionOperation) Do() error {
 }
 
 func (op *completeTransactionOperation) Undo() error {
-	err := op.paymentAPI.CancelOrder(op.orderID)
+	err := op.paymentAPI.RefundOrder(op.orderID)
 	if errors.Is(err, api.ErrOrderPaymentRejected) {
 		return nil
 	}
 	if err != nil {
 		op.logger.With(log.Fields{
 			"orderID": op.orderID,
-		}).WithError(err).Error("failed to cancel order")
+		}).WithError(err).Error("failed to refund order")
 		return err
 	}
 	return nil

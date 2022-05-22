@@ -5,25 +5,51 @@ activate Order
 Order -> Payment: AuthorizeOrder
 activate Payment
 
-Order <-- Payment: OrderAuthorized
+Order <-- Payment: OK
 deactivate Payment
 
 Order -> Stock: ReserveOrderItems
 activate Stock
 
-Order <-- Stock: OrderItemsReserved
+Order <-- Stock: OK
 deactivate Stock
 
 Order -> Payment: CompleteTransaction
 activate Payment
 
-Order <-- Payment: TransactionCompleted
+Order <-- Payment: OK
 deactivate Payment
 
 Order -> Delivery: ScheduleDelivery
 activate Delivery
 
-Order <-- Delivery: DeliveryScheduled
+Order <-- Delivery: OK
 deactivate Delivery
+
+== Откат операций в обратном порядке ==
+
+Order -> Delivery: ScheduleDelivery
+activate Delivery
+
+Order <-- Delivery: ERROR
+deactivate Delivery
+
+Order -> Payment: RefundOrderPayment
+activate Payment
+
+Order <-- Payment: OK
+deactivate Payment
+
+Order -> Stock: RemoveOrderItemsReservation
+activate Stock
+
+Order <-- Stock: OK
+deactivate Stock
+
+Order -> Payment: CancelOrderPayment\n(можно не вызывать, если был рефанд)
+activate Payment
+
+Order <-- Payment: OK
+deactivate Payment
 
 @enduml

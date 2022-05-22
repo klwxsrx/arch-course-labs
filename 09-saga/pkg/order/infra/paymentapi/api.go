@@ -28,6 +28,12 @@ func (a *apiClient) CancelOrder(orderID uuid.UUID) error {
 	return nil
 }
 
+func (a *apiClient) RefundOrder(orderID uuid.UUID) error {
+	//TODO implement me
+	fmt.Println("reject order")
+	return nil
+}
+
 func New(serviceURL string) api.PaymentAPI {
 	return &apiClient{serviceURL: serviceURL}
 }
