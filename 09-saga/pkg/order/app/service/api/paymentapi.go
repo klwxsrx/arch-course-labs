@@ -6,7 +6,9 @@ import (
 )
 
 var (
-	ErrOrderPaymentRejected = errors.New("order payment rejected")
+	ErrOrderPaymentNotFound      = errors.New("order payment not found")
+	ErrOrderPaymentNotAuthorized = errors.New("payment not authorized")
+	ErrOrderPaymentNotCompleted  = errors.New("payment not completed")
 )
 
 type PaymentAPI interface {

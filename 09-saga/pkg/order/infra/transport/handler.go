@@ -77,6 +77,10 @@ func createOrderHandler(srv *service.OrderService, w http.ResponseWriter, r *htt
 	}
 
 	err = srv.Create(idempotenceKey, subjectID, createOrder.AddressID, orderItems)
+	if errors.Is(err, service.ErrOrderRejected) {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
 	if errors.Is(err, service.ErrOrderAlreadyCreated) {
 		w.WriteHeader(http.StatusConflict)
 		return
@@ -120,7 +124,7 @@ func getHandlerFunc(
 	}
 }
 
-func NewHTTPHandler(userProfileService *service.OrderService, logger log.Logger) (http.Handler, error) {
+func NewHTTPHandler(orderService *service.OrderService, logger log.Logger) (http.Handler, error) {
 	router := mux.NewRouter()
 
 	for _, route := range getRoutes() {
@@ -128,7 +132,7 @@ func NewHTTPHandler(userProfileService *service.OrderService, logger log.Logger)
 			Methods(route.Method).
 			Path(route.Pattern).
 			Name(route.Name).
-			HandlerFunc(getHandlerFunc(userProfileService, route.Handler))
+			HandlerFunc(getHandlerFunc(orderService, route.Handler))
 	}
 
 	router.Use(transport.NewLoggingMiddleware(logger))

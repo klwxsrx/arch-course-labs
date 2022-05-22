@@ -29,7 +29,7 @@ func (l *lock) Get() error {
 }
 
 func (l *lock) Release() {
-	_ = l.client.Get("SELECT RELEASE_LOCK(MD5(CONCAT(DATABASE(), ?)))", l.name)
+	_, _ = l.client.Exec("SELECT RELEASE_LOCK(MD5(CONCAT(DATABASE(), ?)))", l.name)
 }
 
 func NewLock(client Client, name string) Lock {

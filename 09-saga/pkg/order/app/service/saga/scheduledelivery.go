@@ -1,6 +1,7 @@
 package saga
 
 import (
+	"errors"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/log"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/saga"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/app/service/api"
@@ -18,6 +19,7 @@ func (op *scheduleDeliveryOperation) Name() string {
 }
 
 func (op *scheduleDeliveryOperation) Do() error {
+	return errors.New("qweq")
 	err := op.deliveryAPI.ScheduleDelivery()
 	if err != nil {
 		op.logger.With(log.Fields{

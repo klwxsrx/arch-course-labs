@@ -1,6 +1,6 @@
 .PHONY: clean docker-image/%
 
-all: clean bin/order docker-image/order
+all: clean bin/order bin/payment docker-image/order docker-image/payment
 
 clean:
 	rm -rf bin/*

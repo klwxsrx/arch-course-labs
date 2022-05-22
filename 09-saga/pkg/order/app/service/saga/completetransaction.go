@@ -1,7 +1,6 @@
 package saga
 
 import (
-	"errors"
 	"github.com/google/uuid"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/log"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/saga"
@@ -31,9 +30,6 @@ func (op *completeTransactionOperation) Do() error {
 
 func (op *completeTransactionOperation) Undo() error {
 	err := op.paymentAPI.RefundOrder(op.orderID)
-	if errors.Is(err, api.ErrOrderPaymentRejected) {
-		return nil
-	}
 	if err != nil {
 		op.logger.With(log.Fields{
 			"orderID": op.orderID,

@@ -8,15 +8,15 @@ import (
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/domain"
 )
 
-type repo struct { // TODO: store order items
+type orderRepo struct { // TODO: store order items
 	client mysql.Client
 }
 
-func (r *repo) NextID() uuid.UUID {
+func (r *orderRepo) NextID() uuid.UUID {
 	return uuid.New()
 }
 
-func (r *repo) GetByID(id uuid.UUID) (*domain.Order, error) {
+func (r *orderRepo) GetByID(id uuid.UUID) (*domain.Order, error) {
 	const orderQuery = `
 		SELECT id, user_id, address_id, status, total_amount
 		FROM ` + " `order` " + `
@@ -47,7 +47,7 @@ func (r *repo) GetByID(id uuid.UUID) (*domain.Order, error) {
 	}, nil
 }
 
-func (r *repo) Store(order *domain.Order) error {
+func (r *orderRepo) Store(order *domain.Order) error {
 	const orderQuery = `
 		INSERT INTO` + " `order` " + `(id, user_id, address_id, status, total_amount, created_at)
 		VALUES (?, ?, ?, ?, ?, NOW())
@@ -76,7 +76,7 @@ func (r *repo) Store(order *domain.Order) error {
 }
 
 func NewOrderRepository(client mysql.Client) domain.OrderRepository {
-	return &repo{client: client}
+	return &orderRepo{client: client}
 }
 
 type sqlxOrder struct {

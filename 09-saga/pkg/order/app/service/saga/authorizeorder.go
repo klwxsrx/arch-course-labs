@@ -31,7 +31,7 @@ func (op *authorizeOrderOperation) Do() error {
 
 func (op *authorizeOrderOperation) Undo() error {
 	err := op.paymentAPI.CancelOrder(op.order.ID)
-	if errors.Is(err, api.ErrOrderPaymentRejected) {
+	if errors.Is(err, api.ErrOrderPaymentNotAuthorized) {
 		return nil
 	}
 	if err != nil {

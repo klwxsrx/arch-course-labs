@@ -6,14 +6,11 @@ import (
 )
 
 type config struct {
-	DBName             string
-	DBHost             string
-	DBPort             string
-	DBUser             string
-	DBPassword         string
-	PaymentServiceURL  string
-	StockServiceURL    string
-	DeliveryServiceURL string
+	DBName     string
+	DBHost     string
+	DBPort     string
+	DBUser     string
+	DBPassword string
 }
 
 func parseEnvString(key string, err error) (string, error) {
@@ -34,9 +31,6 @@ func parseConfig() (*config, error) {
 	dbPort, err := parseEnvString("DATABASE_PORT", err)
 	dbUser, err := parseEnvString("DATABASE_USER", err)
 	dbPassword, err := parseEnvString("DATABASE_PASSWORD", err)
-	paymentServiceURL, err := parseEnvString("PAYMENT_SERVICE_URL", err)
-	stockServiceURL, err := parseEnvString("STOCK_SERVICE_URL", err)
-	deliveryServiceURL, err := parseEnvString("DELIVERY_SERVICE_URL", err)
 
 	if err != nil {
 		return nil, err
@@ -48,8 +42,5 @@ func parseConfig() (*config, error) {
 		dbPort,
 		dbUser,
 		dbPassword,
-		paymentServiceURL,
-		stockServiceURL,
-		deliveryServiceURL,
 	}, nil
 }

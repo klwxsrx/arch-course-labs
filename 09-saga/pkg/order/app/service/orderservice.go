@@ -16,6 +16,7 @@ import (
 var (
 	ErrOrderAlreadyCreated = errors.New("order with key is already created")
 	ErrEmptyOrder          = errors.New("empty or completely free order")
+	ErrOrderRejected       = errors.New("order rejected")
 )
 
 type OrderService struct {
@@ -50,11 +51,18 @@ func (s *OrderService) Create(
 		"order":  order.ID,
 		"result": err,
 	}).Info("order creation completed")
-	if err != nil {
-		return s.updateOrderStatus(order.ID, domain.OrderStatusCancelled)
-	} else {
+
+	// order sent for delivery
+	if err == nil {
 		return s.updateOrderStatus(order.ID, domain.OrderStatusSentForDelivery)
 	}
+
+	// order rejected
+	err = s.updateOrderStatus(order.ID, domain.OrderStatusCancelled)
+	if err != nil {
+		return err
+	}
+	return ErrOrderRejected
 }
 
 func (s *OrderService) createNewOrder(
