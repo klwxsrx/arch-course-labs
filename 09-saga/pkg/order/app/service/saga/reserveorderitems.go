@@ -3,7 +3,6 @@ package saga
 import (
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/log"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/saga"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/app/service/api"
@@ -21,12 +20,15 @@ func (op *reserveOrderItemsOperation) Name() string {
 }
 
 func (op *reserveOrderItemsOperation) Do() error {
-	itemIDs := make([]uuid.UUID, 0, len(op.order.Items))
-	for _, item := range op.order.Items {
-		itemIDs = append(itemIDs, item.ID)
+	items := make([]api.ItemQuantity, 0, len(op.order.Items))
+	for _, orderItem := range op.order.Items {
+		items = append(items, api.ItemQuantity{
+			ItemID:   orderItem.ID,
+			Quantity: orderItem.Quantity,
+		})
 	}
 
-	err := op.warehouseAPI.ReserveOrderItems(op.order.ID, itemIDs)
+	err := op.warehouseAPI.ReserveOrderItems(op.order.ID, items)
 	if errors.Is(err, api.ErrOrderItemsOutOfStock) {
 		return fmt.Errorf("failed to reserve items: %w", err)
 	}
