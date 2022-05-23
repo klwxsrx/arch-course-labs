@@ -1,4 +1,4 @@
-package stockapi
+package warehouseapi
 
 import (
 	"fmt"
@@ -22,6 +22,6 @@ func (a *apiClient) RemoveOrderItemsReservation(orderID uuid.UUID) error {
 	return nil
 }
 
-func New(serviceURL string) api.StockAPI {
+func New(serviceURL string) api.WarehouseAPI {
 	return &apiClient{serviceURL: serviceURL}
 }

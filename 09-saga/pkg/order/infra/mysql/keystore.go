@@ -1,8 +1,8 @@
 package mysql
 
 import (
+	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/idempotence"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/infra/mysql"
-	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/app/idempotence"
 )
 
 type idempotenceKeyStore struct {

@@ -1,7 +1,7 @@
 # Процесс проведения платежа
 ![docs/services.puml](http://www.plantuml.com/plantuml/proxy?fmt=svg&src=https://raw.githubusercontent.com/klwxsrx/arch-course-labs/master/09-saga/docs/purchase.puml)
 
-Сервис `Order` является оркестратором процесса, реализует паттерн Saga
+Сервис `Order` является оркестратором процесса, реализует паттерн Saga.
 
 # Установка
 ## Добавить аддон ingress minikube

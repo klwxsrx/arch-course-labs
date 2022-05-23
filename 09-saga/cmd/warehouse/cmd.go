@@ -2,16 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/klwxsrx/arch-course-labs/saga/data/mysql/order"
+	"github.com/klwxsrx/arch-course-labs/saga/data/mysql/warehouse"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/log"
 	loggerImpl "github.com/klwxsrx/arch-course-labs/saga/pkg/common/infra/logger"
 	commonMysql "github.com/klwxsrx/arch-course-labs/saga/pkg/common/infra/mysql"
-	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/app/service"
-	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/infra/deliveryapi"
-	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/infra/mysql"
-	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/infra/paymentapi"
-	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/infra/transport"
-	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/infra/warehouseapi"
+	"github.com/klwxsrx/arch-course-labs/saga/pkg/warehouse/app/service"
+	"github.com/klwxsrx/arch-course-labs/saga/pkg/warehouse/infra/mysql"
+	"github.com/klwxsrx/arch-course-labs/saga/pkg/warehouse/infra/transport"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,7 +29,7 @@ func main() {
 	}
 	defer db.Close()
 
-	migration, err := commonMysql.NewMigration(client, logger, order.MysqlMigrations)
+	migration, err := commonMysql.NewMigration(client, logger, warehouse.MysqlMigrations)
 	if err != nil {
 		logger.WithError(err).Fatal("failed to setup db migration")
 	}
@@ -41,20 +38,13 @@ func main() {
 		logger.WithError(err).Fatal("failed to execute db migration")
 	}
 
-	paymentAPI := paymentapi.New(config.PaymentServiceURL)
-	warehouseAPI := warehouseapi.New(config.WarehouseServiceURL)
-	deliveryAPI := deliveryapi.New(config.DeliveryServiceURL)
-
 	unitOfWork := mysql.NewUnitOfWork(client)
-	orderService := service.NewOrderService(
-		paymentAPI,
-		warehouseAPI,
-		deliveryAPI,
+	warehouseService := service.NewWarehouseService(
 		unitOfWork,
 		logger,
 	)
 
-	server, err := startServer(orderService, logger)
+	server, err := startServer(warehouseService, logger)
 	if err != nil {
 		logger.WithError(err).Fatal("failed to start server")
 	}
@@ -83,8 +73,8 @@ func getDatabaseClient(config *config, logger log.Logger) (commonMysql.Connectio
 	return db, client, nil
 }
 
-func startServer(orderService *service.OrderService, logger log.Logger) (*http.Server, error) {
-	handler, err := transport.NewHTTPHandler(orderService, logger)
+func startServer(warehouseService *service.WarehouseService, logger log.Logger) (*http.Server, error) {
+	handler, err := transport.NewHTTPHandler(warehouseService, logger)
 	if err != nil {
 		return nil, err
 	}

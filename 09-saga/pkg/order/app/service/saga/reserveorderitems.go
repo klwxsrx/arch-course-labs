@@ -11,9 +11,9 @@ import (
 )
 
 type reserveOrderItemsOperation struct {
-	stockAPI api.StockAPI
-	order    *domain.Order
-	logger   log.Logger
+	warehouseAPI api.WarehouseAPI
+	order        *domain.Order
+	logger       log.Logger
 }
 
 func (op *reserveOrderItemsOperation) Name() string {
@@ -26,7 +26,7 @@ func (op *reserveOrderItemsOperation) Do() error {
 		itemIDs = append(itemIDs, item.ID)
 	}
 
-	err := op.stockAPI.ReserveOrderItems(op.order.ID, itemIDs)
+	err := op.warehouseAPI.ReserveOrderItems(op.order.ID, itemIDs)
 	if errors.Is(err, api.ErrOrderItemsOutOfStock) {
 		return fmt.Errorf("failed to reserve items: %w", err)
 	}
@@ -40,7 +40,7 @@ func (op *reserveOrderItemsOperation) Do() error {
 }
 
 func (op *reserveOrderItemsOperation) Undo() error {
-	err := op.stockAPI.RemoveOrderItemsReservation(op.order.ID)
+	err := op.warehouseAPI.RemoveOrderItemsReservation(op.order.ID)
 	if err != nil {
 		op.logger.With(log.Fields{
 			"orderID": op.order.ID,
@@ -51,13 +51,13 @@ func (op *reserveOrderItemsOperation) Undo() error {
 }
 
 func NewReserveOrderItemsOperation(
-	stockAPI api.StockAPI,
+	warehouseAPI api.WarehouseAPI,
 	order *domain.Order,
 	logger log.Logger,
 ) saga.Operation {
 	return &reserveOrderItemsOperation{
-		stockAPI: stockAPI,
-		order:    order,
-		logger:   logger,
+		warehouseAPI: warehouseAPI,
+		order:        order,
+		logger:       logger,
 	}
 }

@@ -7,7 +7,7 @@ import (
 
 var ErrOrderItemsOutOfStock = errors.New("items out of stock")
 
-type StockAPI interface {
+type WarehouseAPI interface {
 	ReserveOrderItems(orderID uuid.UUID, itemIDs []uuid.UUID) error
 	RemoveOrderItemsReservation(orderID uuid.UUID) error
 }

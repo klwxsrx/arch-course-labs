@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/idempotence"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/log"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/saga"
-	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/app/idempotence"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/app/persistence"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/app/service/api"
 	orderSaga "github.com/klwxsrx/arch-course-labs/saga/pkg/order/app/service/saga"
@@ -20,9 +20,9 @@ var (
 )
 
 type OrderService struct {
-	paymentAPI  api.PaymentAPI
-	stockAPI    api.StockAPI
-	deliveryAPI api.DeliveryAPI
+	paymentAPI   api.PaymentAPI
+	warehouseAPI api.WarehouseAPI
+	deliveryAPI  api.DeliveryAPI
 
 	ufw    persistence.UnitOfWork
 	logger log.Logger
@@ -41,7 +41,7 @@ func (s *OrderService) Create(
 
 	processOrderSaga := saga.New(fmt.Sprintf("ProcessOrder_%v", order.ID), []saga.Operation{
 		orderSaga.NewAuthorizeOrderPaymentOperation(s.paymentAPI, order, s.logger),
-		orderSaga.NewReserveOrderItemsOperation(s.stockAPI, order, s.logger),
+		orderSaga.NewReserveOrderItemsOperation(s.warehouseAPI, order, s.logger),
 		orderSaga.NewScheduleDeliveryOperation(s.deliveryAPI, order, s.logger),
 		orderSaga.NewCompletePaymentTransactionOperation(s.paymentAPI, order.ID, s.logger),
 	}, s.logger)
@@ -52,12 +52,13 @@ func (s *OrderService) Create(
 		"result": err,
 	}).Info("order creation completed")
 
-	// order sent for delivery
+	// order set for delivery
 	if err == nil {
-		return s.updateOrderStatus(order.ID, domain.OrderStatusSentForDelivery)
+		// TODO: sent event to process delivery
+		return s.updateOrderStatus(order.ID, domain.OrderStatusAwaitingDelivery)
 	}
 
-	// order rejected
+	// order cancelled
 	err = s.updateOrderStatus(order.ID, domain.OrderStatusCancelled)
 	if err != nil {
 		return err
@@ -141,16 +142,16 @@ func (s *OrderService) calculateTotalAmount(items []domain.OrderItem) int {
 
 func NewOrderService(
 	paymentAPI api.PaymentAPI,
-	stockAPI api.StockAPI,
+	warehouseAPI api.WarehouseAPI,
 	deliveryAPI api.DeliveryAPI,
 	ufw persistence.UnitOfWork,
 	logger log.Logger,
 ) *OrderService {
 	return &OrderService{
-		paymentAPI:  paymentAPI,
-		stockAPI:    stockAPI,
-		deliveryAPI: deliveryAPI,
-		ufw:         ufw,
-		logger:      logger,
+		paymentAPI:   paymentAPI,
+		warehouseAPI: warehouseAPI,
+		deliveryAPI:  deliveryAPI,
+		ufw:          ufw,
+		logger:       logger,
 	}
 }

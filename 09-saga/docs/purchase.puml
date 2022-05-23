@@ -8,11 +8,11 @@ activate Payment
 Order <-- Payment: OK
 deactivate Payment
 
-Order -> Stock: ReserveOrderItems
-activate Stock
+Order -> Warehouse: ReserveOrderItems
+activate Warehouse
 
-Order <-- Stock: OK
-deactivate Stock
+Order <-- Warehouse: OK
+deactivate Warehouse
 
 Order -> Delivery: ScheduleDelivery
 activate Delivery
@@ -38,11 +38,11 @@ activate Delivery
 Order <-- Delivery: OK
 deactivate Delivery
 
-Order -> Stock: RemoveOrderItemsReservation
-activate Stock
+Order -> Warehouse: RemoveOrderItemsReservation
+activate Warehouse
 
-Order <-- Stock: OK
-deactivate Stock
+Order <-- Warehouse: OK
+deactivate Warehouse
 
 Order -> Payment: CancelOrderPayment\n(можно не вызывать в случае отклонения платежа)
 activate Payment

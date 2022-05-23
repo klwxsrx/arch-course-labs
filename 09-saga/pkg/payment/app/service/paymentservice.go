@@ -76,9 +76,8 @@ func (s *PaymentService) CompletePayment(orderID uuid.UUID) error {
 		s.logger.WithError(err).With(log.Fields{
 			"orderID": orderID,
 		}).Error("failed to complete payment")
-		return err
 	}
-	return nil
+	return err
 }
 
 func (s *PaymentService) CancelPayment(orderID uuid.UUID) error {

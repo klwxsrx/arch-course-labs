@@ -4,27 +4,38 @@ import (
 	"fmt"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/app/idempotence"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/common/infra/mysql"
-	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/app/persistence"
-	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/domain"
+	mysql2 "github.com/klwxsrx/arch-course-labs/saga/pkg/order/infra/mysql"
+	"github.com/klwxsrx/arch-course-labs/saga/pkg/warehouse/app/persistence"
+	"github.com/klwxsrx/arch-course-labs/saga/pkg/warehouse/domain"
 )
 
 type persistentProvider struct {
 	db mysql.Client
 }
 
-func (p *persistentProvider) OrderRepository() domain.OrderRepository {
-	return NewOrderRepository(p.db)
+func (p *persistentProvider) Stock() domain.Stock {
+	return NewStock(p.db)
 }
 
 func (p *persistentProvider) IdempotenceKeyStore() idempotence.KeyStore {
-	return NewIdempotenceKeyStore(p.db)
+	return mysql2.NewIdempotenceKeyStore(p.db)
 }
 
 type unitOfWork struct {
 	client mysql.TransactionalClient
 }
 
-func (u *unitOfWork) Execute(f func(p persistence.PersistentProvider) error) error {
+func (u *unitOfWork) Execute(lockName string, f func(p persistence.PersistentProvider) error) error {
+	if lockName != "" {
+		lock := mysql.NewLock(u.client, lockName)
+		err := lock.Get()
+		if err != nil {
+			return fmt.Errorf("failed to get lock %v: %w", lockName, err)
+		}
+
+		defer lock.Release()
+	}
+
 	tx, err := u.client.Begin()
 	if err != nil {
 		return fmt.Errorf("failed to start tx: %w", err)
