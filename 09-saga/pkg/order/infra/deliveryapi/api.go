@@ -2,6 +2,7 @@ package deliveryapi
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/order/app/service/api"
 )
 
@@ -9,15 +10,15 @@ type apiClient struct {
 	serviceURL string
 }
 
-func (a *apiClient) DeleteDeliverySchedule() error {
+func (a *apiClient) ScheduleDelivery(orderID uuid.UUID, addressID uuid.UUID) error {
 	//TODO implement me
-	fmt.Println("delete delivery schedule")
+	fmt.Println("schedule delivery")
 	return nil
 }
 
-func (a *apiClient) ScheduleDelivery() error {
+func (a *apiClient) DeleteDeliverySchedule(orderID uuid.UUID) error {
 	//TODO implement me
-	fmt.Println("schedule delivery")
+	fmt.Println("delete delivery schedule")
 	return nil
 }
 

@@ -18,7 +18,7 @@ func (op *scheduleDeliveryOperation) Name() string {
 }
 
 func (op *scheduleDeliveryOperation) Do() error {
-	err := op.deliveryAPI.ScheduleDelivery()
+	err := op.deliveryAPI.ScheduleDelivery(op.order.ID, op.order.AddressID)
 	if err != nil {
 		op.logger.With(log.Fields{
 			"orderID": op.order.ID,
@@ -29,7 +29,7 @@ func (op *scheduleDeliveryOperation) Do() error {
 }
 
 func (op *scheduleDeliveryOperation) Undo() error {
-	err := op.deliveryAPI.DeleteDeliverySchedule()
+	err := op.deliveryAPI.DeleteDeliverySchedule(op.order.ID)
 	if err != nil {
 		op.logger.With(log.Fields{
 			"orderID": op.order.ID,
