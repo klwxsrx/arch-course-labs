@@ -8,9 +8,12 @@ import (
 	"github.com/klwxsrx/arch-course-labs/saga/pkg/payment/domain"
 )
 
+const testTotalAmountToFail = 1000000
+
 var (
 	ErrPaymentNotFound      = errors.New("payment not found")
 	ErrPaymentNotAuthorized = errors.New("payment not authorized")
+	ErrPaymentRejected      = errors.New("payment has been rejected")
 )
 
 type PaymentService struct {
@@ -19,8 +22,9 @@ type PaymentService struct {
 }
 
 func (s *PaymentService) CreatePayment(orderID uuid.UUID, totalAmount int) error {
+	// TODO: authorize payment from payment gateway
+
 	err := s.ufw.Execute(func(p persistence.PersistentProvider) error {
-		// TODO: authorize payment from payment gateway
 		payment, err := p.PaymentRepository().GetByID(orderID)
 		if err != nil && !errors.Is(err, domain.ErrPaymentNotFound) {
 			return err
@@ -48,9 +52,10 @@ func (s *PaymentService) CreatePayment(orderID uuid.UUID, totalAmount int) error
 }
 
 func (s *PaymentService) CompletePayment(orderID uuid.UUID) error {
-	err := s.ufw.Execute(func(p persistence.PersistentProvider) error {
-		// TODO: complete payment from payment gateway
+	// TODO: complete payment from payment gateway
 
+	var testRejectedPayment bool
+	err := s.ufw.Execute(func(p persistence.PersistentProvider) error {
 		payment, err := p.PaymentRepository().GetByID(orderID)
 		if errors.Is(err, domain.ErrPaymentNotFound) {
 			return ErrPaymentNotFound
@@ -66,9 +71,25 @@ func (s *PaymentService) CompletePayment(orderID uuid.UUID) error {
 			return ErrPaymentNotAuthorized
 		}
 
+		// test case to fail the saga
+		if payment.TotalAmount == testTotalAmountToFail {
+			payment.Status = domain.PaymentStatusRejected
+
+			err := p.PaymentRepository().Store(payment)
+			if err != nil {
+				return err
+			}
+			testRejectedPayment = true
+			return nil
+		}
+
 		payment.Status = domain.PaymentStatusCompleted
 		return p.PaymentRepository().Store(payment)
 	})
+	if testRejectedPayment {
+		return ErrPaymentRejected
+	}
+
 	if errors.Is(err, ErrPaymentNotFound) || errors.Is(err, ErrPaymentNotAuthorized) {
 		return nil
 	}
@@ -81,9 +102,9 @@ func (s *PaymentService) CompletePayment(orderID uuid.UUID) error {
 }
 
 func (s *PaymentService) CancelPayment(orderID uuid.UUID) error {
-	err := s.ufw.Execute(func(p persistence.PersistentProvider) error {
-		// TODO: cancel payment from payment gateway
+	// TODO: cancel payment from payment gateway
 
+	err := s.ufw.Execute(func(p persistence.PersistentProvider) error {
 		payment, err := p.PaymentRepository().GetByID(orderID)
 		if errors.Is(err, domain.ErrPaymentNotFound) {
 			return ErrPaymentNotFound

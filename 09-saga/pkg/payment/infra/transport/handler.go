@@ -139,6 +139,10 @@ func completePaymentHandler(srv *service.PaymentService, _ query.PaymentQuerySer
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
+	if errors.Is(err, service.ErrPaymentRejected) {
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

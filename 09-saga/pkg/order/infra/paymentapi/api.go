@@ -66,6 +66,8 @@ func (a *apiClient) CompleteTransaction(orderID uuid.UUID) error {
 		return api.ErrOrderPaymentNotFound
 	case http.StatusMethodNotAllowed:
 		return api.ErrOrderPaymentNotAuthorized
+	case http.StatusNotAcceptable:
+		return api.ErrOrderPaymentRejected
 	default:
 		return fmt.Errorf("failed to completeTransaction, httpCode: %v", resp.StatusCode)
 	}
