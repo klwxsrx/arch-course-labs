@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: order
+  namespace: arch-course
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    - host: arch.homework
+      http:
+        paths:
+          - path: /orders
+            pathType: Prefix
+            backend:
+              service:
+                name: order
+                port:
+                  name: web
+          - path: /payment/
+            pathType: Prefix
+            backend:
+              service:
+                name: payment
+                port:
+                  name: web
+          - path: /warehouse/
+            pathType: Prefix
+            backend:
+              service:
+                name: warehouse
+                port:
+                  name: web
+          - path: /delivery/
+            pathType: Prefix
+            backend:
+              service:
+                name: delivery
+                port:
+                  name: web

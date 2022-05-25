@@ -76,9 +76,16 @@ func createOrderHandler(srv *service.OrderService, w http.ResponseWriter, r *htt
 		})
 	}
 
-	err = srv.Create(idempotenceKey, subjectID, createOrder.AddressID, orderItems)
+	orderID, err := srv.Create(idempotenceKey, subjectID, createOrder.AddressID, orderItems)
 	if errors.Is(err, service.ErrOrderRejected) {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		_ = json.NewEncoder(w).Encode(struct {
+			OrderID uuid.UUID `json:"order_id"`
+			Success bool      `json:"success"`
+		}{
+			OrderID: orderID,
+			Success: false,
+		})
+		w.WriteHeader(http.StatusCreated)
 		return
 	}
 	if errors.Is(err, service.ErrOrderAlreadyCreated) {
@@ -93,7 +100,14 @@ func createOrderHandler(srv *service.OrderService, w http.ResponseWriter, r *htt
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusCreated)
+
+	_ = json.NewEncoder(w).Encode(struct {
+		OrderID uuid.UUID `json:"order_id"`
+		Success bool      `json:"success"`
+	}{
+		OrderID: orderID,
+		Success: true,
+	})
 }
 
 func healthCheckHandler(_ *service.OrderService, w http.ResponseWriter, _ *http.Request) {

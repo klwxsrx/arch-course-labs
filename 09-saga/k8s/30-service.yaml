@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: order
+  namespace: arch-course
+spec:
+  selector:
+    app: order
+  ports:
+    - name: web
+      port: 8080
+      targetPort: web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment
+  namespace: arch-course
+spec:
+  selector:
+    app: payment
+  ports:
+    - name: web
+      port: 8080
+      targetPort: web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: warehouse
+  namespace: arch-course
+spec:
+  selector:
+    app: warehouse
+  ports:
+    - name: web
+      port: 8080
+      targetPort: web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: delivery
+  namespace: arch-course
+spec:
+  selector:
+    app: delivery
+  ports:
+    - name: web
+      port: 8080
+      targetPort: web

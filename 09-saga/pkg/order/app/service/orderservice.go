@@ -33,10 +33,10 @@ func (s *OrderService) Create(
 	userID uuid.UUID,
 	addressID uuid.UUID,
 	items []domain.OrderItem,
-) error {
+) (uuid.UUID, error) {
 	order, err := s.createNewOrder(idempotenceKey, userID, addressID, items)
 	if err != nil {
-		return err
+		return uuid.UUID{}, err
 	}
 
 	processOrderSaga := saga.New(fmt.Sprintf("ProcessOrder_%v", order.ID), []saga.Operation{
@@ -55,15 +55,15 @@ func (s *OrderService) Create(
 	// order set for delivery
 	if err == nil {
 		// TODO: sent event to process delivery
-		return s.updateOrderStatus(order.ID, domain.OrderStatusAwaitingDelivery)
+		return order.ID, s.updateOrderStatus(order.ID, domain.OrderStatusAwaitingDelivery)
 	}
 
 	// order cancelled
 	err = s.updateOrderStatus(order.ID, domain.OrderStatusCancelled)
 	if err != nil {
-		return err
+		return uuid.UUID{}, err
 	}
-	return ErrOrderRejected
+	return order.ID, ErrOrderRejected
 }
 
 func (s *OrderService) createNewOrder(
