@@ -25,5 +25,7 @@ kubectl apply -f ./k8s
 
 # Запуск тестов
 ```shell
-newman run --env-var="baseUrl=arch.homework" ./test.postman_collection.json
+newman run --env-var="baseUrl=arch.homework" ./tests/successful_purchase.postman_collection.json
+newman run --env-var="baseUrl=arch.homework" ./tests/failed_purchase.postman_collection.json
 ```
+В тесте с неуспешной попыткой покупки откат саги происходит на этапе CompletePaymentTransaction, см. схему выше. 
