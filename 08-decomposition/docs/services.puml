@@ -1,0 +1,54 @@
+@startuml
+skinparam defaultTextAlignment center
+
+actor User [
+    Frontend
+]
+
+cloud APIGateway [
+    Api Gateway
+    (Traefik)
+]
+
+component Auth
+
+component Cart
+
+component Order
+
+component Catalog
+
+component Payment
+
+component Warehouse
+
+component Delivery
+
+User -right-> APIGateway
+
+APIGateway -right-> Auth: GET /auth
+APIGateway <-right- Auth: X-Auth-User-ID: ...
+
+APIGateway --> Catalog: GET /web/products
+
+APIGateway --> Cart: GET /web/cart\nPUT /web/cart\nPOST /web/cart/checkout
+
+Cart --> Catalog: GET /products
+
+Cart ---> Order: PUT /orders
+
+note left: Асинхронное взаимодействие\n(используется Apache Pulsar)
+
+Order ...> Payment: AuthorizePayment\nCompletePayment\nCancelPayment
+
+Order <... Payment: PaymentAuthorized\nPaymentRejected\nPaymentCompleted\nPaymentCompletionRejected
+
+Order ...> Warehouse: ReserveItems\nDeleteItemsReservation
+
+Order <... Warehouse: ItemsReserved\nItemsOutOfStock
+
+Order ...> Delivery: ScheduleDelivery\nCancelSchedule
+
+Order <... Delivery: DeliveryScheduled
+
+@enduml
